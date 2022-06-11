@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_socket_chatapp/screens/chat_page.dart';
 
 import '../model/user_model.dart';
+import '../widgets/alert_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -51,6 +52,21 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              displayDialog(
+                  title: 'Log Out',
+                  context: context,
+                  subTitle: 'Are you sure you want log out of your account?',
+                  negativeText: 'No',
+                  positiveText: 'Yes',
+                  positiveFunction: () {});
+            },
+            icon: const Icon(Icons.login),
+            splashRadius: 20,
+          )
+        ],
       ),
       body: ListView.builder(
           itemCount: userList.length,
