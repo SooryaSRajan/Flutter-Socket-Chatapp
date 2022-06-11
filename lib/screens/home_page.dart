@@ -38,7 +38,19 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Flutter.IO"),
+        title: Padding(
+          padding: const EdgeInsets.only(left: 5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text("Flutter.IO"),
+              Text(
+                "Soorya S",
+                style: TextStyle(color: Colors.white54, fontSize: 14),
+              ),
+            ],
+          ),
+        ),
       ),
       body: ListView.builder(
           itemCount: userList.length,
