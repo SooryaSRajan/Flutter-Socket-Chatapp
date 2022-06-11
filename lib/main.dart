@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_socket_chatapp/screens/greeting_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Chat App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-      )
+      ),
+      home: const GreetingPage(),
     );
   }
 }
