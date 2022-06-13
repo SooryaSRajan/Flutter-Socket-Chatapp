@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_chatapp/screens/chat_page.dart';
+import 'package:flutter_socket_chatapp/screens/greeting_page.dart';
+import 'package:flutter_socket_chatapp/utils/utils.dart';
 
 import '../model/user_model.dart';
 import '../widgets/alert_dialog.dart';
@@ -61,7 +63,14 @@ class _HomePageState extends State<HomePage> {
                   subTitle: 'Are you sure you want log out of your account?',
                   negativeText: 'No',
                   positiveText: 'Yes',
-                  positiveFunction: () {});
+                  positiveFunction: () {
+                    clearAllData();
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const GreetingPage()),
+                            (Route<dynamic> route) => false);
+                  });
             },
             icon: const Icon(Icons.login),
             splashRadius: 20,
