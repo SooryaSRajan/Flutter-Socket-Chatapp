@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:socket_io_client/socket_io_client.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_chatapp/model/chat_model.dart';
@@ -8,10 +9,15 @@ import 'package:flutter_socket_chatapp/widgets/right_chat.dart';
 import '../utils/http_modules.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key, required this.userName, required this.profileName})
+  const ChatPage(
+      {Key? key,
+      required this.userName,
+      required this.profileName,
+      required this.socket})
       : super(key: key);
   final String userName;
   final String profileName;
+  final Socket socket;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -20,29 +26,46 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   bool isOnline = false;
   String chatId = "";
+  final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   List<ChatModel> chatList = [];
 
-  getPreviousChats() async {
-    var response =
-        await makeHTTPRequest(null, "/chats/${widget.userName}", null, true, false);
+  setupChats() async {
+    var response = await makeHTTPRequest(
+        null, "/chats/${widget.userName}", null, true, false);
 
-    print(json.decode(response.body)['message']);
     if (response.statusCode == 200) {
       var users = json.decode(response.body)['chats'];
       for (var i in users) {
-        chatList.add(ChatModel(message: i['message'], sentBy: i['sentBy']));
-        print(i.toString());
+        chatList.add(ChatModel(
+            message: i['message'],
+            isRightMessage: i['sentBy'] != widget.userName));
       }
+      _scrollToBottom();
+      chatId = json.decode(response.body)['chatId'];
+      widget.socket.on(chatId, (data) {
+        chatList.add(ChatModel(
+            message: data[0], isRightMessage: data[1] != widget.userName));
+        setState(() {});
+        _scrollToBottom();
+      });
       setState(() {});
     }
+  }
+
+  _scrollToBottom() {
+    _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent + 1000,
+        duration: const Duration(seconds: 1),
+        curve: Curves.fastOutSlowIn);
   }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      getPreviousChats();
+      setupChats();
     });
   }
 
@@ -92,14 +115,15 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Expanded(
               child: ListView.builder(
+                controller: _scrollController,
                   itemCount: chatList.length,
                   itemBuilder: (BuildContext context, int index) {
                     var chatData = chatList[index];
 
-                    if (chatData.sentBy == widget.userName) {
-                      return leftMessageWidget(chatData.message);
+                    if (chatData.isRightMessage) {
+                      return rightMessageWidget(chatData.message);
                     }
-                    return rightMessageWidget(chatData.message);
+                    return leftMessageWidget(chatData.message);
                   })),
           Padding(
             padding: const EdgeInsets.all(4),
@@ -108,13 +132,25 @@ class _ChatPageState extends State<ChatPage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: TextField(
+                  controller: _controller,
                   decoration: InputDecoration(
                       hintText: "Send message...",
                       contentPadding: const EdgeInsets.only(top: 15),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.send),
                         splashRadius: 20,
-                        onPressed: () async {},
+                        onPressed: () async {
+                          String message = _controller.text;
+                          if (message.isNotEmpty) {
+                            widget.socket.emit(chatId, message);
+                            _controller.clear();
+                            setState(() {
+                              chatList.add(ChatModel(
+                                  message: message, isRightMessage: true));
+                            });
+                            _scrollToBottom();
+                          }
+                        },
                       ),
                       hintStyle: const TextStyle(color: Colors.black54),
                       border: InputBorder.none),
@@ -126,4 +162,12 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.socket.clearListeners();
+  }
 }
+
+

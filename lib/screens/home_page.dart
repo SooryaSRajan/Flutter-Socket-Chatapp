@@ -20,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<UserModel> userList = [];
+  late Socket socket;
 
   getUserList() async {
     var response =
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   setupSocket() async {
-    Socket socket = io(
+    socket = io(
         "http://$networkAddress",
         OptionBuilder()
             .setTransports(['websocket']) // for Flutter or Dart VM
@@ -124,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                           MaterialPageRoute(
                               builder: (context) => ChatPage(
                                     profileName: userList[index].profileName,
-                                    userName: userList[index].userName,
+                                    userName: userList[index].userName, socket: socket,
                                   )));
                     },
                   ),
