@@ -5,8 +5,10 @@ import 'package:flutter_socket_chatapp/screens/chat_page.dart';
 import 'package:flutter_socket_chatapp/screens/greeting_page.dart';
 import 'package:flutter_socket_chatapp/utils/http_modules.dart';
 import 'package:flutter_socket_chatapp/utils/utils.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 
 import '../model/user_model.dart';
+import '../utils/constants.dart';
 import '../widgets/alert_dialog.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,11 +36,30 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  setupSocket() async {
+    Socket socket = io(
+        "http://$networkAddress",
+        OptionBuilder()
+            .setTransports(['websocket']) // for Flutter or Dart VM
+            .disableAutoConnect()  // disable auto-connection
+            .setExtraHeaders({'user-auth-token': await jwtTokenGet}) // optional
+            .build()
+    );
+    socket.connect();
+    socket.onError((data) => print(data));
+    socket.onConnectError((data) => print(data));
+    socket.onConnect((_) {
+      print('connected to server');
+    });
+  }
+
   @override
   void initState() {
     super.initState();
 
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      setupSocket();
       getUserList();
     });
   }
