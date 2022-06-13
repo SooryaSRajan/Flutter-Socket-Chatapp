@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_chatapp/screens/greeting_page.dart';
+import 'package:flutter_socket_chatapp/screens/home_page.dart';
+import 'package:flutter_socket_chatapp/utils/utils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,9 +18,17 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const GreetingPage(),
+      home: FutureBuilder(
+        future: jwtTokenGet,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (!snapshot.hasError) {
+            if (snapshot.hasData) {
+              return const HomePage();
+            }
+          }
+          return const GreetingPage();
+        },
+      ),
     );
   }
 }
-
-
