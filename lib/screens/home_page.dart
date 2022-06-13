@@ -99,6 +99,8 @@ class _HomePageState extends State<HomePage> {
                   positiveText: 'Yes',
                   positiveFunction: () {
                     clearAllData();
+                    socket.clearListeners();
+                    socket.disconnect();
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
@@ -135,5 +137,12 @@ class _HomePageState extends State<HomePage> {
               child: Text("No users so far"),
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    socket.clearListeners();
+    socket.disconnect();
   }
 }
