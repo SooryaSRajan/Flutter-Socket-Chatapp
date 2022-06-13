@@ -79,6 +79,7 @@ class _SignUpPageState extends State<SignUpPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 10, bottom: 10),
                 child: TextFormField(
+                  obscureText: true,
                   validator: (value) {
                     if (value == "" || value == null) {
                       return "Password cannot be empty";
