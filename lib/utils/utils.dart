@@ -19,24 +19,13 @@ set jwtTokenSet(String jwt) {
 }
 
 ///Name
-Future<String> get getName async {
+Future<String> get getProfileName async {
   var name = await storage.read(key: nameKey);
   if (name == null) return "";
   return name;
 }
 
-set setName(String name) {
+set setProfileName(String name) {
   storage.write(key: nameKey, value: name);
-}
-
-///User ID
-Future<String> get getUserId async {
-  var userId = await storage.read(key: userIdKey);
-  if (userId == null) return "";
-  return userId;
-}
-
-set setUserId(String userId) {
-  storage.write(key: userIdKey, value: userId);
 }
 

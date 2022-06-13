@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'constants.dart';
 import 'utils.dart';
 
-Future<http.Response> makePostRequest(body, String route,
+Future<http.Response> makeHTTPRequest(body, String route,
     Map<String, dynamic>? queryParameters, attachJWT, isPOST,
     {BuildContext? context}) async {
   try {
