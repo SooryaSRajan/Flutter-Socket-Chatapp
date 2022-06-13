@@ -50,6 +50,24 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {});
         _scrollToBottom();
       });
+
+      widget.socket.emit('status', widget.userName);
+      widget.socket.on(
+          widget.userName,
+          (data) {
+                if (data == 'ONLINE')
+                  {
+                    setState(() {
+                      isOnline = true;
+                    });
+                  }
+                else
+                  {
+                    setState(() {
+                      isOnline = false;
+                    });
+                  }
+              });
       setState(() {});
     }
   }
@@ -115,7 +133,7 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Expanded(
               child: ListView.builder(
-                controller: _scrollController,
+                  controller: _scrollController,
                   itemCount: chatList.length,
                   itemBuilder: (BuildContext context, int index) {
                     var chatData = chatList[index];
@@ -169,5 +187,3 @@ class _ChatPageState extends State<ChatPage> {
     widget.socket.clearListeners();
   }
 }
-
-
