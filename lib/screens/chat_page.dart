@@ -37,13 +37,16 @@ class _ChatPageState extends State<ChatPage> {
 
     if (response.statusCode == 200) {
       var users = json.decode(response.body)['chats'];
-      for (var i in users) {
-        chatList.add(ChatModel(
-            message: i['message'],
-            isRightMessage: i['sentBy'] != widget.userName));
+      if (users != null) {
+        for (var i in users) {
+          chatList.add(ChatModel(
+              message: i['message'],
+              isRightMessage: i['sentBy'] != widget.userName));
+        }
+        _scrollToBottom();
       }
-      _scrollToBottom();
       chatId = json.decode(response.body)['chatId'];
+      print(chatId);
       widget.socket.on(chatId, (data) {
         chatList.add(ChatModel(
             message: data[0], isRightMessage: data[1] != widget.userName));
@@ -52,22 +55,17 @@ class _ChatPageState extends State<ChatPage> {
       });
 
       widget.socket.emit('status', widget.userName);
-      widget.socket.on(
-          widget.userName,
-          (data) {
-                if (data == 'ONLINE')
-                  {
-                    setState(() {
-                      isOnline = true;
-                    });
-                  }
-                else
-                  {
-                    setState(() {
-                      isOnline = false;
-                    });
-                  }
-              });
+      widget.socket.on(widget.userName, (data) {
+        if (data == 'ONLINE') {
+          setState(() {
+            isOnline = true;
+          });
+        } else {
+          setState(() {
+            isOnline = false;
+          });
+        }
+      });
       setState(() {});
     }
   }
@@ -160,7 +158,7 @@ class _ChatPageState extends State<ChatPage> {
                         onPressed: () async {
                           String message = _controller.text;
                           if (message.isNotEmpty) {
-                            widget.socket.emit(chatId, message);
+                            widget.socket.emit('message', [message, chatId]);
                             _controller.clear();
                             setState(() {
                               chatList.add(ChatModel(
