@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_socket_chatapp/model/chat_model.dart';
 import 'package:flutter_socket_chatapp/widgets/left_chat.dart';
 import 'package:flutter_socket_chatapp/widgets/right_chat.dart';
+
+import '../utils/http_modules.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key, required this.userName, required this.profileName})
@@ -14,6 +19,32 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   bool isOnline = false;
+  String chatId = "";
+
+  List<ChatModel> chatList = [];
+
+  getPreviousChats() async {
+    var response =
+        await makeHTTPRequest(null, "/chats/${widget.userName}", null, true, false);
+
+    print(json.decode(response.body)['message']);
+    if (response.statusCode == 200) {
+      var users = json.decode(response.body)['chats'];
+      for (var i in users) {
+        chatList.add(ChatModel(message: i['message'], sentBy: i['sentBy']));
+        print(i.toString());
+      }
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getPreviousChats();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +92,14 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Expanded(
               child: ListView.builder(
-                  itemCount: 10,
+                  itemCount: chatList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    //TODO: rightMessageWidget(message) and leftMessageWidget("message")
-                    return leftMessageWidget("message");
+                    var chatData = chatList[index];
+
+                    if (chatData.sentBy == widget.userName) {
+                      return leftMessageWidget(chatData.message);
+                    }
+                    return rightMessageWidget(chatData.message);
                   })),
           Padding(
             padding: const EdgeInsets.all(4),

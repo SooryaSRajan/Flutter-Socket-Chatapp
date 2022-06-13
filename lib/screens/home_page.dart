@@ -23,12 +23,14 @@ class _HomePageState extends State<HomePage> {
     var response =
         await makeHTTPRequest(null, "/user/users", null, true, false);
 
+    print(json.decode(response.body)['message']);
     if (response.statusCode == 200) {
       var users = json.decode(response.body)['users'];
       for (var i in users) {
         userList.add(
             UserModel(userName: i['userName'], profileName: i['profileName']));
       }
+      setState(() {});
     }
   }
 
@@ -38,7 +40,6 @@ class _HomePageState extends State<HomePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getUserList();
-      setState(() {});
     });
   }
 
