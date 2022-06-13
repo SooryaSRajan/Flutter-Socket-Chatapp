@@ -13,7 +13,7 @@ Future<http.Response> makeHTTPRequest(body, String route,
     var contentType = {"Content-Type": "application/json"};
 
     if (attachJWT) {
-      contentType["user-auth-token"] = await jwtTokenGet;
+      contentType["user-auth-token"] = await jwtTokenGet ?? "";
     }
 
     http.Response res;

@@ -8,10 +8,8 @@ clearAllData() {
 }
 
 ///JWT
-Future<String> get jwtTokenGet async {
-  var jwt = await storage.read(key: storageJWTKey);
-  if (jwt == null) return "";
-  return jwt;
+Future<String?> get jwtTokenGet async {
+  return await storage.read(key: storageJWTKey);
 }
 
 set jwtTokenSet(String jwt) {
