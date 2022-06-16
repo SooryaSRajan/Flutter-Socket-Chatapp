@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   getUserList() async {
     var response =
-    await makeHTTPRequest(null, "/user/users", null, true, false);
+        await makeHTTPRequest(null, "/user/users", null, true, false);
 
     print(json.decode(response.body)['message']);
     if (response.statusCode == 200) {
@@ -36,21 +36,21 @@ class _HomePageState extends State<HomePage> {
       setState(() {});
     }
     socket.on("new_user", (data) {
-        setState((){
-          userList.add(UserModel(userName: data[1], profileName: data[0]));
-        });
+      setState(() {
+        userList.add(UserModel(userName: data[1], profileName: data[0]));
+      });
     });
   }
 
   setupSocket() async {
+    print(isHTTPS ? "https://$networkAddress" : "http://$networkAddress");
     socket = io(
-        "http://$networkAddress",
+        isHTTPS ? "https://$networkAddress" : "http://$networkAddress",
         OptionBuilder()
             .setTransports(['websocket']) // for Flutter or Dart VM
             .disableAutoConnect() // disable auto-connection
             .setExtraHeaders({'user-auth-token': await jwtTokenGet}) // optional
-            .build()
-    );
+            .build());
     socket.connect();
     socket.onError((data) => print(data));
     socket.onConnectError((data) => print(data));
@@ -62,7 +62,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setupSocket();
@@ -110,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => const GreetingPage()),
-                            (Route<dynamic> route) => false);
+                        (Route<dynamic> route) => false);
                   });
             },
             icon: const Icon(Icons.login),
@@ -120,29 +119,28 @@ class _HomePageState extends State<HomePage> {
       ),
       body: userList.isNotEmpty
           ? ListView.builder(
-          itemCount: userList.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: ListTile(
-                title: Text(userList[index].profileName),
-                subtitle: Text(userList[index].userName),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ChatPage(
-                                profileName: userList[index].profileName,
-                                userName: userList[index].userName,
-                                socket: socket,
-                              )));
-                },
-              ),
-            );
-          })
+              itemCount: userList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: ListTile(
+                    title: Text(userList[index].profileName),
+                    subtitle: Text(userList[index].userName),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ChatPage(
+                                    profileName: userList[index].profileName,
+                                    userName: userList[index].userName,
+                                    socket: socket,
+                                  )));
+                    },
+                  ),
+                );
+              })
           : const Center(
-        child: Text("No users so far"),
-      ),
+              child: Text("No users so far"),
+            ),
     );
   }
 
