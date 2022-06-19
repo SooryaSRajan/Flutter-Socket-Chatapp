@@ -131,6 +131,7 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Expanded(
               child: ListView.builder(
+                physics: const ClampingScrollPhysics(),
                   controller: _scrollController,
                   itemCount: chatList.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -183,5 +184,6 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     super.dispose();
     widget.socket.clearListeners();
+    _scrollController.dispose();
   }
 }
