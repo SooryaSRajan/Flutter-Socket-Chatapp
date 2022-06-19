@@ -31,7 +31,7 @@ class _ChatPageState extends State<ChatPage> {
 
   List<ChatModel> chatList = [];
 
-  getChats() async {
+  setupChats() async {
     var response = await makeHTTPRequest(
         null, "/chats/${widget.userName}", null, true, false);
 
@@ -42,11 +42,11 @@ class _ChatPageState extends State<ChatPage> {
           chatList.add(ChatModel(
               message: i['message'],
               isRightMessage: i['sentBy'] != widget.userName));
+          setState(() {});
         }
         _scrollToBottom();
       }
       chatId = json.decode(response.body)['chatId'];
-      print(chatId);
       widget.socket.on(chatId, (data) {
         chatList.add(ChatModel(
             message: data[0], isRightMessage: data[1] != widget.userName));
@@ -67,6 +67,8 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      //Gets online status
       widget.socket.emit('status', widget.userName);
       widget.socket.on(widget.userName, (data) {
         if (data == 'ONLINE') {
@@ -79,8 +81,7 @@ class _ChatPageState extends State<ChatPage> {
           });
         }
       });
-      setState(() {});
-      getChats();
+      setupChats();
     });
   }
 
