@@ -35,7 +35,8 @@ class _HomePageState extends State<HomePage> {
       }
       setState(() {});
     }
-    socket.on("new_user", (data) {
+    socket.on("new_user_socket_event", (data) {
+      print(data);
       setState(() {
         userList.add(UserModel(userName: data[1], profileName: data[0]));
       });
