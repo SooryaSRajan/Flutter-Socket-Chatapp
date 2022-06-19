@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
     var response =
         await makeHTTPRequest(null, "/user/users", null, true, false);
 
-    print(json.decode(response.body)['message']);
     if (response.statusCode == 200) {
       var users = json.decode(response.body)['users'];
       for (var i in users) {
@@ -36,6 +35,11 @@ class _HomePageState extends State<HomePage> {
       }
       setState(() {});
     }
+    socket.on("new_user", (data) {
+      setState(() {
+        userList.add(UserModel(userName: data[1], profileName: data[0]));
+      });
+    });
   }
 
   setupSocket() async {
@@ -51,7 +55,8 @@ class _HomePageState extends State<HomePage> {
     socket.onError((data) => print(data));
     socket.onConnectError((data) => print(data));
     socket.onConnect((_) {
-      print('connected to server');
+      print("Connected successfully to socket server");
+      getUserList();
     });
   }
 
@@ -61,12 +66,6 @@ class _HomePageState extends State<HomePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setupSocket();
-      getUserList();
-      socket.on("new_user", (data) {
-        setState(() {
-          userList.add(UserModel(userName: data[1], profileName: data[0]));
-        });
-      });
     });
   }
 
