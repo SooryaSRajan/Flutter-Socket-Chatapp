@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   late Socket socket;
 
   getUserList() async {
+    userList.clear();
     var response =
         await makeHTTPRequest(null, "/user/users", null, true, false);
 
@@ -35,11 +36,6 @@ class _HomePageState extends State<HomePage> {
       }
       setState(() {});
     }
-    socket.on("new_user", (data) {
-      setState(() {
-        userList.add(UserModel(userName: data[1], profileName: data[0]));
-      });
-    });
   }
 
   setupSocket() async {
@@ -66,6 +62,11 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setupSocket();
       getUserList();
+      socket.on("new_user", (data) {
+        setState(() {
+          userList.add(UserModel(userName: data[1], profileName: data[0]));
+        });
+      });
     });
   }
 
@@ -118,26 +119,31 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: userList.isNotEmpty
-          ? ListView.builder(
-              itemCount: userList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  child: ListTile(
-                    title: Text(userList[index].profileName),
-                    subtitle: Text(userList[index].userName),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ChatPage(
-                                    profileName: userList[index].profileName,
-                                    userName: userList[index].userName,
-                                    socket: socket,
-                                  )));
-                    },
-                  ),
-                );
-              })
+          ? RefreshIndicator(
+            onRefresh: () async {
+              await getUserList();
+            },
+            child: ListView.builder(
+                itemCount: userList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      title: Text(userList[index].profileName),
+                      subtitle: Text(userList[index].userName),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatPage(
+                                      profileName: userList[index].profileName,
+                                      userName: userList[index].userName,
+                                      socket: socket,
+                                    )));
+                      },
+                    ),
+                  );
+                }),
+          )
           : const Center(
               child: Text("No users so far"),
             ),
