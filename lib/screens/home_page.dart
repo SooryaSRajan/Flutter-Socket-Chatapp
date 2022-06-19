@@ -35,12 +35,6 @@ class _HomePageState extends State<HomePage> {
       }
       setState(() {});
     }
-    socket.on("new_user_socket_event", (data) {
-      print(data);
-      setState(() {
-        userList.add(UserModel(userName: data[1], profileName: data[0]));
-      });
-    });
   }
 
   setupSocket() async {
@@ -58,6 +52,11 @@ class _HomePageState extends State<HomePage> {
     socket.onConnect((_) {
       print("Connected successfully to socket server");
       getUserList();
+    });
+    socket.on("new_user_socket_event", (data) {
+      setState(() {
+        userList.add(UserModel(userName: data[1], profileName: data[0]));
+      });
     });
   }
 
