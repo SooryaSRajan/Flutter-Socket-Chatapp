@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_socket_chatapp/screens/home_page.dart';
 import 'package:flutter_socket_chatapp/screens/signup_page.dart';
 import 'package:flutter_socket_chatapp/utils/http_modules.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_socket_chatapp/utils/colors.dart' as colors;
 
 import '../utils/utils.dart';
 import '../widgets/error_box.dart';
@@ -23,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: colors.scaffoldColor,
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -32,9 +35,19 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(child: Container()),
-              const Text(
+              Text(
                 "Login",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                style: GoogleFonts.raleway(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w600,
+                    color: colors.textColor),
+              ),
+              Text(
+                "Start chatting with your friends!",
+                style: GoogleFonts.raleway(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    color: colors.textColor),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 50),
@@ -49,11 +62,14 @@ class _LoginPageState extends State<LoginPage> {
                   onSaved: (value) {
                     userName = value;
                   },
-                  decoration: const InputDecoration(
-                      labelText: "User Name",
+                  decoration: InputDecoration(
+                      labelText: "Username",
                       hintText: "Enter user name, eg: john_myers",
                       filled: true,
-                      border: OutlineInputBorder()),
+                      labelStyle:
+                          GoogleFonts.raleway(color: colors.textFIeldTextColor),
+                      fillColor: colors.textFieldColor,
+                      border: const OutlineInputBorder()),
                 ),
               ),
               Padding(
@@ -70,24 +86,28 @@ class _LoginPageState extends State<LoginPage> {
                   onSaved: (value) {
                     password = value;
                   },
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       labelText: "Password",
+                      labelStyle:
+                          GoogleFonts.raleway(color: colors.textFIeldTextColor),
                       hintText: "Enter your password here",
                       filled: true,
-                      border: OutlineInputBorder()),
+                      fillColor: colors.textFieldColor,
+                      border: const OutlineInputBorder()),
                 ),
               ),
               errorBox(error),
-              Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignUpPage()));
-                      },
-                      child: const Text("Don't have an account? Sign up"))),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpPage()));
+                  },
+                  child: Text(
+                    "Don't have an account? Sign up",
+                    style: GoogleFonts.raleway(color: colors.textColor),
+                  )),
               Expanded(child: Container()),
               Align(
                 alignment: Alignment.centerRight,
@@ -123,9 +143,13 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     }
                   },
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: ElevatedButton.styleFrom(primary: colors.buttonColor),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 15.0),
+                    child: Text(
+                      'LOGIN',
+                      style: GoogleFonts.raleway(fontSize: 15, fontWeight: FontWeight.bold,color: colors.buttonTextColor),
+                    ),
                   ),
                 ),
               )
